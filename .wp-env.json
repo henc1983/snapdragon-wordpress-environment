@@ -1,0 +1,8 @@
+{
+    "themes": [
+        "./snapdragon"
+    ],
+    "mappings": {
+        "wp-content/themes/snapdragon": "./snapdragon"
+    }
+}
