@@ -23,14 +23,7 @@ if ( ! class_exists( 'SnapdragonUpdater' ) ) {
        
         
         private static $instance = null;
-        
-        
-        
-        private const UPDATER_USER = 'henc1983';
-		private const UPDATER_REPO = 'snapdragon-wordpress-environment';
-		private const UPDATER_TOKEN = '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';
-
-        
+               
 
         public static function instance() {
 			if ( self::$instance === null ) {
@@ -44,8 +37,6 @@ if ( ! class_exists( 'SnapdragonUpdater' ) ) {
 
         public function __construct() {
             add_filter( 'pre_set_site_transient_update_themes' , [ $this , 'automatic_github_updates' ] , 100 , 1 );
-            
-            add_filter( 'http_request_args' , [ $this , 'parse_request_args' ] , 10 , 2 );
         }
 
 
@@ -55,21 +46,21 @@ if ( ! class_exists( 'SnapdragonUpdater' ) ) {
             $theme   = get_stylesheet();
             $current = wp_get_theme()->get('Version');
             
-            // GitHub information
-            $user   = $this::UPDATER_USER;
-            $repo   = $this::UPDATER_REPO;
-            $token  = $this::UPDATER_TOKEN;
-            
             // Get the latest release tag from the repository. The User-Agent header must be sent, as per
             // GitHub's API documentation: https://developer.github.com/v3/#user-agent-required
             
+            $user = wp_get_theme()->get('UserName');
+            $url = wp_get_theme()->get('UpdateURI');
+            $theme_url = wp_get_theme()->get('ThemeURI');
+            
             $stream_context = [
                 'http' => [
-                    'header' => "User-Agent: " . $user . "\r\nAuthorization: Bearer " . $token . "\r\nAccept: application/vnd.github.v3+json\r\nX-GitHub-Api-Version: 2022-11-28\r\n"
+                    'header' => "User-Agent: $user\r\n"
                 ]
             ];
 
-            $file = @json_decode(@file_get_contents("https://api.github.com/repos/$user/$repo/releases/latest", false,
+
+            $file = @json_decode(@file_get_contents($url, false,
                 stream_context_create($stream_context)
             ));
 
@@ -83,35 +74,15 @@ if ( ! class_exists( 'SnapdragonUpdater' ) ) {
                 $data->response[$theme] = [
                     'theme'       => $theme,
                     'new_version' => $update,
-                    'url'         => "https://github.com/$user/$repo",
-                    'package'     => $file->assets[0]->browser_download_url,
+                    'url'         => $theme_url,
+                    'package'     => $file->assets[0]->browser_download_url
                 ];
                 }
             }
+
+
+
             return $data;
-        }
-
-
-
-        public function parse_request_args( $parsed_args , $url ) {
-
-            $user   = $this::UPDATER_USER;
-            $repo   = $this::UPDATER_REPO;
-            $token  = $this::UPDATER_TOKEN;
-
-            if(empty($parsed_args['headers'])) {
-                $parsed_args['headers'] = [];
-            }
-
-            if ( strpos($url, "https://api.github.com/repos/{$user}/{$repo}") !== FALSE ) {
-                $parsed_args['headers']['Authorization'] = "Bearer $token";
-                $parsed_args['headers']['Accept'] = 'application/vnd.github.v3+json';
-                $parsed_args['headers']['X-GitHub-Api-Version'] = '2022-11-28';
-                $parsed_args['headers']['User-Agent'] = $user;
-            }
-            
-            return $parsed_args;
-
         }
     }
 }

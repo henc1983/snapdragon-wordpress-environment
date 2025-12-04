@@ -9,6 +9,20 @@ defined('ABSPATH') or die('No script kiddies please!');
 
 
 
+if ( ! function_exists( 'snapdragon_display_comments' ) ) {
+	/**
+	 * Snapdragon display comments
+	 * @since  1.0
+	 */
+	function snapdragon_display_comments() {
+		if ( comments_open() || 0 !== intval( get_comments_number() ) ) :
+			comments_template();
+		endif;
+	}
+}
+
+
+
 if ( ! function_exists( 'snapdragon_post_header' ) ) {
 	/**
 	 * Display the post header with a link to the single post
@@ -229,5 +243,55 @@ if ( ! function_exists( 'snapdragon_post_meta' ) ) {
 				],
 			]
 		);
+	}
+}
+
+
+
+if ( ! function_exists( 'snapdragon_page_header' ) ) {
+	/**
+	 * Display the page header
+	 * @since 1.0
+	 */
+	function snapdragon_page_header() {
+		if ( is_front_page() || is_page_template( 'template-homepage.php' ) ) {
+			return;
+		}
+
+		?>
+		<header class="page-header">
+			<?php
+				snapdragon_post_thumbnail( 'full' );
+				the_title( '<h1 class="page-title">', '</h1>' );
+			?>
+		</header>
+
+		<?php
+	}
+}
+
+
+
+if ( ! function_exists( 'snapdragon_page_content' ) ) {
+	/**
+	 * Display the post content
+	 * @since 1.0
+	 */
+	function snapdragon_page_content() {
+		?>
+
+		<div class="page-content">
+			<?php the_content(); ?>
+			<?php
+				wp_link_pages(
+					array(
+						'before' => '<div class="page-links">' . __( 'Pages:', 'snapdragon' ),
+						'after'  => '</div>',
+					)
+				);
+			?>
+		</div>
+
+		<?php
 	}
 }

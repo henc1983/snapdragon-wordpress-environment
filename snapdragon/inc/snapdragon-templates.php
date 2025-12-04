@@ -23,3 +23,16 @@ add_action( 'snapdragon_loop_after' , 'snapdragon_pagination' , 10 );
 
 add_action( 'snapdragon_post_header_before' , 'snapdragon_post_meta' , 10 );
 add_action( 'snapdragon_post_content_before' , 'snapdragon_post_thumbnail' , 10 );
+
+
+
+/**
+ * Pages
+ *
+ * @see  snapdragon_page_header()
+ * @see  snapdragon_page_content()
+ * @see  snapdragon_display_comments()
+ */
+add_action( 'snapdragon_page' , 'snapdragon_page_header' , 10 );
+add_action( 'snapdragon_page' , 'snapdragon_page_content' , 20 );
+add_action( 'snapdragon_page_after' , 'snapdragon_display_comments' , 10 );
